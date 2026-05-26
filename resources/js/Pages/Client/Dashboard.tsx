@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
-import { Cpu, Terminal, Settings, Play, CheckCircle2, AlertTriangle, History, ArrowRight, Save, LogOut, Code, Globe, Lock, FileText, ChevronRight, Zap } from 'lucide-react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
+import { Cpu, Terminal, Settings, Play, CheckCircle2, AlertTriangle, History, ArrowRight, Save, LogOut, Code, Globe, Lock, FileText, ChevronRight, Zap, HelpCircle, Loader2, RefreshCw, User } from 'lucide-react';
 import axios from 'axios';
 
 interface Service {
