@@ -1,0 +1,156 @@
+# =============================================================================
+# NEXUSFLOW OS - ORQUESTADOR DOCKER COMPOSE DE PRODUCCIÓN
+# Orquesta: Nginx, PHP 8.3 FPM, MySQL 8.0, Redis 7.2 y Entorno Python ETL
+# =============================================================================
+
+version: '3.8'
+
+services:
+  #-----------------------------------------------------------------------------
+  # 1. SERVICIO APP: CONTENEDOR DE LA APLICACIÓN LARAVEL
+  #-----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_NAME: nexusflow
+        USER_ID: 1000
+    container_name: nexusflow_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      # EN DESARROLLO: Montar código local para hot-reload.
+      # EN PRODUCCIÓN: Comentar/eliminar esta línea para usar el código inmutable compilado en la imagen.
+      - .:/var/www
+      # Volúmenes de caché y logs
+      - ./storage:/var/www/storage
+      - ./bootstrap/cache:/var/www/bootstrap/cache
+      # EN PRODUCCIÓN (Recomendado): Descomentar para almacenar uploads en volumen persistente
+      # - nexusflow_storage:/var/www/storage/app/public
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-nexusflow_db}
+      - DB_USERNAME=${DB_USERNAME:-forge}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - nexusflow_net
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  #-----------------------------------------------------------------------------
+  # 2. SERVICIO WEBSERVER: PROXY INVERSO NGINX
+  #-----------------------------------------------------------------------------
+  webserver:
+    image: nginx:stable-alpine
+    container_name: nexusflow_webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./storage/logs/nginx:/var/log/nginx
+      - /etc/letsencrypt:/etc/letsencrypt # Para compartir certificados SSL generados
+    networks:
+      - nexusflow_net
+    depends_on:
+      - app
+
+  #-----------------------------------------------------------------------------
+  # 3. SERVICIO DB: MOTOR DE BASE DE DATOS MYSQL 8.0
+  #-----------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: nexusflow_db
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3306:3306" # Expuesto solo localmente para seguridad
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-nexusflow_db}
+      MYSQL_USER: ${DB_USERNAME:-forge}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
+    volumes:
+      - nexusflow_mysql_data:/var/lib/mysql
+    networks:
+      - nexusflow_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  #-----------------------------------------------------------------------------
+  # 4. SERVICIO REDIS: BROKER DE MENSAJES Y CACHÉ
+  #-----------------------------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: nexusflow_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secret}
+    volumes:
+      - nexusflow_redis_data:/data
+    networks:
+      - nexusflow_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secret}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  #-----------------------------------------------------------------------------
+  # 5. SERVICIO QUEUE WORKER: PROCESADOR DE COLAS LARAVEL
+  #-----------------------------------------------------------------------------
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexusflow_queue_worker
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      # EN DESARROLLO: Sincronizar el worker con los cambios locales de código.
+      # EN PRODUCCIÓN: Comentar/eliminar en producción para usar la versión compilada en la imagen.
+      - .:/var/www
+    environment:
+      - APP_ENV=production
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-nexusflow_db}
+      - DB_USERNAME=${DB_USERNAME:-forge}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_secret}
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    networks:
+      - nexusflow_net
+    depends_on:
+      - app
+
+#-----------------------------------------------------------------------------
+# REDES Y VOLÚMENES PERSISTENTES
+#-----------------------------------------------------------------------------
+networks:
+  nexusflow_net:
+    driver: bridge
+
+volumes:
+  nexusflow_mysql_data:
+    driver: local
+  nexusflow_redis_data:
+    driver: local
+  nexusflow_storage:
+    driver: local
