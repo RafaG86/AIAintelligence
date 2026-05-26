@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed Super Admin User safely
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@nexusflow.com'],
             [
                 'name' => 'Rafa AIAIntelligence',
@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. Seed Test Client User safely
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'cliente@aiaintelligence.com'],
             [
                 'name' => 'Cliente Demo',
