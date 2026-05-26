@@ -18,7 +18,7 @@ class StorefrontController extends Controller
     {
         $services = Service::where('is_active', true)->get();
 
-        return Inertia::render('Welcome', [
+        return Inertia::render('Storefront/Index', [
             'services' => $services,
             'canLogin' => true,
             'canRegister' => true,
