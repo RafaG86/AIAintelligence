@@ -1,7 +1,7 @@
-# NexusFlow OS - Modelo de Base de Datos Relacional (ERD & DDL)
-## Módulo Core (Servicios de Automatización/IA) y Módulo Ekklesia (Iglesias)
+# AIAIntelligence OS - Modelo de Base de Datos Relacional (ERD & DDL)
+## Módulo Core (Servicios de Automatización/IA)
 
-Este documento especifica la arquitectura física y lógica de la base de datos MySQL 8.0 para la plataforma **NexusFlow**. Incluye diagramas de relaciones, la descripción de campos clave, índices y el script SQL DDL ejecutable.
+Este documento especifica la arquitectura física y lógica de la base de datos MySQL 8.0 para la plataforma **AIAIntelligence**. Incluye diagramas de relaciones, la descripción de campos clave, índices y el script SQL DDL ejecutable.
 
 ---
 

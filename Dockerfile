@@ -1,5 +1,5 @@
 # =============================================================================
-# NEXUSFLOW OS - DOCKERFILE MULTI-STAGE DE PRODUCCIÓN
+# AIAINTELLIGENCE OS - DOCKERFILE MULTI-STAGE DE PRODUCCIÓN
 # Optimizado para PHP 8.3 FPM, Nginx, React y TypeScript (Inertia.js)
 # =============================================================================
 
@@ -25,7 +25,7 @@ RUN npm run build
 FROM php:8.3-fpm-alpine AS backend-runtime
 
 # Argumentos de compilación para control de permisos
-ARG USER_NAME=nexusflow
+ARG USER_NAME=aiaintelligence
 ARG USER_ID=1000
 
 # Directorio de trabajo en el contenedor

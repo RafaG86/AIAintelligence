@@ -22,7 +22,25 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
     ];
+
+    /**
+     * Helper to verify if the user is a super administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'super-admin';
+    }
+
+    /**
+     * Helper to verify if the user is a client.
+     */
+    public function isCliente(): bool
+    {
+        return $this->role === 'cliente';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

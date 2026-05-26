@@ -1,7 +1,7 @@
-# NexusFlow OS - Manual y Script de Integración de Automatización
+# AIAIntelligence OS - Manual y Script de Integración de Automatización
 ## Conexión Segura de n8n, Python (Pandas ETL) y Laravel 11
 
-Este documento detalla el flujo de automatización e integración lógica de **NexusFlow**. Proporciona un script en PHP (Laravel Controller) seguro para recibir eventos, un script en Python que utiliza Pandas para la limpieza de datos avanzada, y un esquema lógico del flujo de trabajo en **n8n**.
+Este documento detalla el flujo de automatización e integración lógica de **AIAIntelligence**. Proporciona un script en PHP (Laravel Controller) seguro para recibir eventos, un script en Python que utiliza Pandas para la limpieza de datos avanzada, y un esquema lógico del flujo de trabajo en **n8n**.
 
 ---
 
@@ -13,7 +13,7 @@ El flujo de integración opera de forma asíncrona y segura, garantizando que el
 sequenceDiagram
     autonumber
     participant n8n as Motor n8n (Automation)
-    participant Laravel as Laravel API (NexusFlow)
+    participant Laravel as Laravel API (AIAIntelligence)
     participant Python as Python Script (Pandas ETL)
     participant DB as MySQL Database
 

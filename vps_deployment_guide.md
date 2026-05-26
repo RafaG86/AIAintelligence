@@ -1,7 +1,7 @@
-# NexusFlow OS - Guía Suprema de Despliegue en Servidor VPS (Ubuntu)
+# AIAIntelligence OS - Guía Suprema de Despliegue en Servidor VPS (Ubuntu)
 ## Infraestructura en clauding.io: Seguridad, LEMP, Docker y Certificados SSL
 
-Esta guía técnica describe el proceso detallado para aprovisionar, asegurar, configurar y desplegar **NexusFlow** en un servidor VPS con Ubuntu 22.04 LTS (o superior) en el proveedor clauding.io.
+Esta guía técnica describe el proceso detallado para aprovisionar, asegurar, configurar y desplegar **AIAIntelligence** en un servidor VPS con Ubuntu 22.04 LTS (o superior) en el proveedor clauding.io.
 
 ---
 
@@ -246,7 +246,7 @@ Pega el siguiente código optimizado:
 #!/bin/bash
 set -e
 
-echo "=== INICIANDO DESPLIEGUE DE NEXUSFLOW OS ==="
+echo "=== INICIANDO DESPLIEGUE DE AIAINTELLIGENCE OS ==="
 
 # 1. Poner la aplicación Laravel en Modo Mantenimiento
 docker compose exec app php artisan down || true
